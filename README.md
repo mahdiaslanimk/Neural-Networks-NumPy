@@ -1,2 +1,2 @@
-# Neural-Networks-NumPy
-Neural Networks using NumPy - Tensorflow-like implementation
+# Neural Networks using NumPy
+Reimplementaion of Tensorflow library using NumPy
