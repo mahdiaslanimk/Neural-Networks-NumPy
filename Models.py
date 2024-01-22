@@ -31,7 +31,7 @@ class Sequential():
             x = layer.forward(x)
         return x
 
-    def fit(self, x_train, y_train, epochs, batch_size=32, validation_split=0.1, validation_data=None):
+    def fit(self, x_train, y_train, epochs, batch_size=32, validation_split=0, validation_data=None):
         num_layers = len(self.layers)
         num_samples = x_train.shape[0]
 
@@ -76,17 +76,23 @@ class Sequential():
 
             # Metrics
             if self.metrics:
-                y_hat_valid = self.forward(x_valid)
-                self.history["val_loss"].append(self.loss.compute_loss(y_valid, y_hat_valid))
+                if validation_split > 0:
+                    y_hat_valid = self.forward(x_valid)
+                    self.history["val_loss"].append(self.loss.compute_loss(y_valid, y_hat_valid))
                 for metric in self.metrics:
                     self.history[metric.name].append(metric.compute(y_train, y_hat_train))
-                    self.history["val_"+metric.name].append(metric.compute(y_valid, y_hat_valid))
+                    if validation_split > 0:
+                        self.history["val_"+metric.name].append(metric.compute(y_valid, y_hat_valid))
 
-                print(f'Epoch {epoch + 1:2d} /{epochs:2d}, '
-                    f'loss: {self.history["loss"][-1]:2.3f}, '
-                    f'val_loss: {self.history["val_loss"][-1]:2.3f}, '
-                    f'mae: {self.history["mae"][-1]:2.3f}, '
-                    f'val_mae: {self.history["val_mae"][-1]:2.3f}')
+                loss_print = f'Epoch {epoch + 1:2d} / {epochs:2d}, ' +\
+                             f'loss: {self.history["loss"][-1]:2.3f}' +\
+                             (f', val_loss: {self.history["val_loss"][-1]:2.3f}' if validation_split > 0 else "")
+
+                metrics_print = ', '.join([', %s: %2.3f'%(metric.name, self.history[metric.name][-1]) +\
+                                          (', %s: %2.3f '%("val_" + metric.name, self.history["val_" + metric.name][-1])
+                                           if validation_split > 0 else "") for metric in self.metrics])
+
+                print(loss_print + metrics_print)
             else:
                 print(f'Epoch {epoch + 1:2d} /{epochs:2d}, '
                     f'loss: {self.history["loss"][-1]:2.3f}')
