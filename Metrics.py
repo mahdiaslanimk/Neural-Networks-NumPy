@@ -1,11 +1,8 @@
-
 import numpy as np
 
 
-
-
 class Accuracy:
-    def __init__(self, name='accuracy', one_hot=False):
+    def __init__(self, name="accuracy", one_hot=False):
         self.name = name
         self.one_hot = one_hot
 
@@ -18,7 +15,7 @@ class Accuracy:
 
 
 class MeanAbsoluteError:
-    def __init__(self, name='mae'):
+    def __init__(self, name="mae"):
         self.name = name
 
     def compute(self, y_true, y_pred):
