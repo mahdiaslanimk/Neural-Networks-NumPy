@@ -33,6 +33,14 @@ class Sequential:
                 x = layer.forward(x)
         return x
 
+    def update_params(self, optimizer=None):
+        optimizer = self.optimizer if optimizer == None else optimizer
+        params = [param for layer in self.layers[1:] for param in layer.get_params()]
+        gradients = [
+            grad for layer in self.layers[1:] for grad in layer.get_gradients()
+        ]
+        optimizer.update(params, gradients)
+
     def fit(
         self,
         x_train,
@@ -78,13 +86,7 @@ class Sequential:
                     sens = layer.backward()
 
                 # Update parameters using optimizer
-                params = [
-                    param for layer in self.layers[1:] for param in layer.get_params()
-                ]
-                gradients = [
-                    grad for layer in self.layers[1:] for grad in layer.get_gradients()
-                ]
-                self.optimizer.update(params, gradients)
+                self.update_params()
 
             y_hat_train = self.forward(x_train)
             self.history["loss"].append(self.loss.compute_loss(y_train, y_hat_train))
