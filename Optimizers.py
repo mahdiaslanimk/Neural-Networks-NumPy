@@ -27,6 +27,33 @@ class MomentumSGD:
             params[i] -= self.learning_rate * self.velocity[i]
 
 
+class RMSprop:
+    def __init__(self, learning_rate, beta=0.9, epsilon=1e-8):
+        self.learning_rate = learning_rate
+        self.beta = beta
+        self.epsilon = epsilon
+        self.accumulated_squared_gradients = None
+
+    def update(self, params, gradients):
+        if self.accumulated_squared_gradients is None:
+            self.accumulated_squared_gradients = [
+                np.zeros_like(param) for param in params
+            ]
+
+        for i in range(len(params)):
+            self.accumulated_squared_gradients[
+                i
+            ] = self.beta * self.accumulated_squared_gradients[i] + (1 - self.beta) * (
+                gradients[i] ** 2
+            )
+
+            params[i] -= (
+                self.learning_rate
+                * gradients[i]
+                / (np.sqrt(self.accumulated_squared_gradients[i]) + self.epsilon)
+            )
+
+
 class Adam:
     def __init__(self, learning_rate, beta1=0.9, beta2=0.999, epsilon=1e-8):
         self.learning_rate = learning_rate
