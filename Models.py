@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 from Dense import Dense
 from Dropout import Dropout
@@ -143,3 +144,20 @@ class Sequential:
                         validation_data[1], self.forward(validation_data[0])
                     )
                 )
+
+    def clone_model(self):
+        new_model = Sequential()
+
+        for layer in self.layers:
+            new_layer = copy.deepcopy(
+                layer
+            )  # Use deepcopy to create a new instance of each layer
+            new_model.layers.append(new_layer)
+
+        # Copy other attributes
+        new_model.optimizer = self.optimizer
+        new_model.loss = self.loss
+        new_model.metrics = self.metrics
+        new_model.history = self.history
+
+        return new_model
