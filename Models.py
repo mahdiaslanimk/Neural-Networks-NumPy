@@ -1,5 +1,6 @@
 import numpy as np
 from Dense import Dense
+from Dropout import Dropout
 
 
 class Sequential:
@@ -23,9 +24,12 @@ class Sequential:
         self.loss = loss
         self.metrics = metrics
 
-    def forward(self, x):
+    def forward(self, x, training=False):
         for layer in self.layers:
-            x = layer.forward(x)
+            if isinstance(layer, Dropout):
+                x = layer.forward(x, training=training)
+            else:
+                x = layer.forward(x)
         return x
 
     def fit(
@@ -64,7 +68,7 @@ class Sequential:
                 y_batch = y_train[i : i + batch_size]
 
                 # forward pass
-                y_hat = self.forward(x_batch)  # NN's output (pred.)
+                y_hat = self.forward(x_batch, training=True)  # NN's output (pred.)
 
                 # backward pass
                 sens = self.loss.compute_derivative(y_batch, y_hat)
